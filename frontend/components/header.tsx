@@ -3,8 +3,7 @@ import Link from "next/link";
 export default function Header() {
   return (
     <header>
-      <div>Admin</div>
-
+      <Link href="/">Admin</Link>
       <nav>
         <ul>
           <li>

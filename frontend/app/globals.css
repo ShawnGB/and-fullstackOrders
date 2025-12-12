@@ -28,6 +28,15 @@ header {
   height: 8em;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
+}
+
+nav {
+  ul {
+    display: flex;
+    flex-direction: row;
+    gap: 2em;
+    list-style: none;
+  }
 }
