@@ -5,6 +5,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { Customer } from 'src/customer/entities/customer.entity';
 
 @Injectable()
 export class OrderService {
@@ -13,12 +14,21 @@ export class OrderService {
     private orderRepository: Repository<Order>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(Customer)
+    private customerRepository: Repository<Customer>,
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
     const { productIds, customerId, totalPrice } = createOrderDto;
 
-    // Fetch products by their IDs
+    const customer = await this.customerRepository.findOne({
+      where: { id: customerId },
+    });
+
+    if (!customer) {
+      throw new NotFoundException(`Customer with ID ${customerId} not found`);
+    }
+
     const products = await this.productRepository.findBy({
       id: In(productIds),
     });
@@ -28,7 +38,7 @@ export class OrderService {
     }
 
     const order = this.orderRepository.create({
-      customerId,
+      customer,
       totalPrice,
       products,
     });
@@ -64,12 +74,13 @@ export class OrderService {
         throw new NotFoundException('One or more products not found');
       }
       order.products = products;
-    }
 
-    Object.assign(order, {
-      customerId: updateOrderDto.customerId,
-      totalPrice: updateOrderDto.totalPrice,
-    });
+      // Recalculate total price based on products
+      order.totalPrice = products.reduce(
+        (sum, product) => sum + Number(product.price),
+        0,
+      );
+    }
 
     return await this.orderRepository.save(order);
   }

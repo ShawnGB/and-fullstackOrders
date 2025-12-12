@@ -2,11 +2,14 @@ import { Customer } from 'src/customer/entities/customer.entity';
 import { Product } from 'src/product/entities/product.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -18,10 +21,8 @@ export class Order {
   orderNumber: number;
 
   @ManyToOne(() => Customer, (customer) => customer.orders)
+  @JoinColumn({ name: 'customerId' })
   customer: Customer;
-
-  @Column()
-  customerId: string;
 
   @ManyToMany(() => Product)
   @JoinTable()
@@ -29,4 +30,10 @@ export class Order {
 
   @Column('decimal', { precision: 10, scale: 2 })
   totalPrice: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

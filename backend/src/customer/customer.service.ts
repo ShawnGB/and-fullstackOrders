@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { Customer } from './entities/customer.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class CustomerService {
@@ -13,14 +18,28 @@ export class CustomerService {
   ) {}
 
   async create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
-    // TODO: Hash password with bcrypt before saving
-    const customer = this.customerRepository.create(createCustomerDto);
+    const existingCustomer = await this.customerRepository.findOne({
+      where: { email: createCustomerDto.email },
+    });
+
+    if (existingCustomer) {
+      throw new BadRequestException('Email already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(createCustomerDto.password, 10);
+    const customer = this.customerRepository.create({
+      ...createCustomerDto,
+      password: hashedPassword,
+    });
     return await this.customerRepository.save(customer);
   }
 
   async findAll(): Promise<Customer[]> {
     return await this.customerRepository.find({
       relations: ['orders'],
+      order: {
+        name: 'ASC',
+      },
     });
   }
 
@@ -40,7 +59,14 @@ export class CustomerService {
     updateCustomerDto: UpdateCustomerDto,
   ): Promise<Customer> {
     const customer = await this.findOne(id);
-    // TODO: Hash password if it's being updated
+
+    if (updateCustomerDto.password) {
+      updateCustomerDto.password = await bcrypt.hash(
+        updateCustomerDto.password,
+        10,
+      );
+    }
+
     Object.assign(customer, updateCustomerDto);
     return await this.customerRepository.save(customer);
   }

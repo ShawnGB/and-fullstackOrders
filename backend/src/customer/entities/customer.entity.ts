@@ -1,5 +1,13 @@
 import { Order } from 'src/order/entities/order.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Customer {
@@ -13,8 +21,15 @@ export class Customer {
   email: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @OneToMany(() => Order, (order) => order.customer)
   orders: Order[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
