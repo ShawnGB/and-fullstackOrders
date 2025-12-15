@@ -19,7 +19,7 @@ export class OrderService {
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const { productIds, customerId, totalPrice } = createOrderDto;
+    const { productIds, customerId } = createOrderDto;
 
     const customer = await this.customerRepository.findOne({
       where: { id: customerId },
@@ -36,6 +36,12 @@ export class OrderService {
     if (products.length !== productIds.length) {
       throw new NotFoundException('One or more products not found');
     }
+
+    // Calculate total price from products
+    const totalPrice = products.reduce(
+      (sum, product) => sum + Number(product.price),
+      0,
+    );
 
     const order = this.orderRepository.create({
       customer,

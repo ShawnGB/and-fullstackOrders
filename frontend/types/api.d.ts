@@ -1,41 +1,41 @@
-type BaseEntity = {
+interface BaseEntity {
   id: string;
   createdAt: string;
   updatedAt: string;
-};
+}
 
-export interface Product extends BaseEntity {
+interface Product extends BaseEntity {
   name: string;
   description: string;
   price: number;
 }
 
-export interface Customer extends BaseEntity {
+interface Customer extends BaseEntity {
   name: string;
   email: string;
   orders?: Order[];
 }
 
-export interface Order extends BaseEntity {
+interface Order extends BaseEntity {
   orderNumber: number;
   customer: Customer;
   products: Product[];
   totalPrice: number;
 }
 
-export type CreateProduct = Omit<Product, keyof BaseEntity>;
-export type UpdateProduct = Partial<CreateProduct>;
+type CreateProduct = Omit<Product, keyof BaseEntity>;
+type UpdateProduct = Partial<CreateProduct>;
 
-export type CreateCustomer = Omit<Customer, keyof BaseEntity | 'orders'> & {
+type CreateCustomer = Omit<Customer, keyof BaseEntity | "orders"> & {
   password: string;
 };
-export type UpdateCustomer = Partial<CreateCustomer>;
+type UpdateCustomer = Partial<CreateCustomer>;
 
-export type CreateOrder = {
+interface CreateOrder {
   customerId: string;
   productIds: string[];
-  totalPrice: number;
-};
-export type UpdateOrder = {
+}
+
+interface UpdateOrder {
   productIds?: string[];
-};
+}
