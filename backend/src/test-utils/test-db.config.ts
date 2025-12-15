@@ -4,7 +4,7 @@ import { Customer } from '../customer/entities/customer.entity';
 import { Order } from '../order/entities/order.entity';
 import { Product } from '../product/entities/product.entity';
 
-let postgresContainer: StartedPostgreSqlContainer;
+let postgresContainer: StartedPostgreSqlContainer | undefined;
 
 export const startTestDatabase = async (): Promise<void> => {
   if (!postgresContainer) {
