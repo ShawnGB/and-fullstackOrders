@@ -1,11 +1,11 @@
-import OrdersList from '@/components/OrdersList';
+import OrdersTable from "@/components/OrdersTable";
 
-const API_URL = process.env.API_URL || 'http://localhost:3000';
+const API_URL = process.env.API_URL || "http://localhost:3000";
 
 async function getOrders(): Promise<Order[]> {
   try {
     const response = await fetch(`${API_URL}/order`, {
-      cache: 'no-store',
+      cache: "no-store",
     });
 
     if (!response.ok) {
@@ -14,7 +14,7 @@ async function getOrders(): Promise<Order[]> {
 
     return response.json();
   } catch (error) {
-    console.error('Error fetching orders:', error);
+    console.error("Error fetching orders:", error);
     return [];
   }
 }
@@ -22,7 +22,9 @@ async function getOrders(): Promise<Order[]> {
 export default async function OrdersPage() {
   const orders = await getOrders();
 
-  console.log('Orders:', orders);
-
-  return <OrdersList orders={orders} />;
+  return (
+    <section>
+      <OrdersTable orders={orders} />
+    </section>
+  );
 }
