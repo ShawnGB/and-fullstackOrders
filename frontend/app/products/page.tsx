@@ -1,11 +1,11 @@
-import ProductsList from '@/components/ProductsList';
+import ProductsTable from "@/components/ProductsTable";
 
-const API_URL = process.env.API_URL || 'http://localhost:3000';
+const API_URL = process.env.API_URL || "http://localhost:3000";
 
 async function getProducts(): Promise<Product[]> {
   try {
     const response = await fetch(`${API_URL}/product`, {
-      cache: 'no-store',
+      cache: "no-store",
     });
 
     if (!response.ok) {
@@ -14,7 +14,7 @@ async function getProducts(): Promise<Product[]> {
 
     return response.json();
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
     return [];
   }
 }
@@ -22,7 +22,9 @@ async function getProducts(): Promise<Product[]> {
 export default async function ProductsPage() {
   const products = await getProducts();
 
-  console.log('Products:', products);
-
-  return <ProductsList products={products} />;
+  return (
+    <section>
+      <ProductsTable products={products} />
+    </section>
+  );
 }

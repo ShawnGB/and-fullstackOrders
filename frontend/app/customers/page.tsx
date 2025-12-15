@@ -1,4 +1,4 @@
-import CustomersList from '@/components/CustomersList';
+import CustomersTable from "@/components/CustomersTable";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
@@ -22,7 +22,9 @@ async function getCustomers(): Promise<Customer[]> {
 export default async function CustomersPage() {
   const customers = await getCustomers();
 
-  console.log("Customers:", customers);
-
-  return <CustomersList customers={customers} />;
+  return (
+    <section>
+      <CustomersTable customers={customers} />
+    </section>
+  );
 }
