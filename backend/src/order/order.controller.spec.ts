@@ -78,7 +78,6 @@ describe('OrderController (Integration)', () => {
       const createDto = {
         customerId: customerResponse.body.id,
         productIds: [product1Response.body.id, product2Response.body.id],
-        totalPrice: 1029.98,
       };
 
       const response = await request(app.getHttpServer())
@@ -90,7 +89,7 @@ describe('OrderController (Integration)', () => {
       expect(response.body.customer).toBeDefined();
       expect(response.body.customer.id).toBe(createDto.customerId);
       expect(response.body.products).toHaveLength(2);
-      expect(Number(response.body.totalPrice)).toBe(createDto.totalPrice);
+      expect(Number(response.body.totalPrice)).toBe(1029.98);
     });
 
     it('should return 400 when customerId is not a UUID', async () => {
@@ -105,7 +104,6 @@ describe('OrderController (Integration)', () => {
       const createDto = {
         customerId: 'invalid-uuid',
         productIds: [productResponse.body.id],
-        totalPrice: 999.99,
       };
 
       await request(app.getHttpServer())
@@ -126,7 +124,6 @@ describe('OrderController (Integration)', () => {
       const createDto = {
         customerId: customerResponse.body.id,
         productIds: ['00000000-0000-0000-0000-000000000000'],
-        totalPrice: 100,
       };
 
       await request(app.getHttpServer())
@@ -135,7 +132,7 @@ describe('OrderController (Integration)', () => {
         .expect(400);
     });
 
-    it('should return 400 when totalPrice is negative', async () => {
+    it('should return 400 when productIds is empty', async () => {
       const customerResponse = await request(app.getHttpServer())
         .post('/customer')
         .send({
@@ -144,18 +141,9 @@ describe('OrderController (Integration)', () => {
           password: 'password123',
         });
 
-      const productResponse = await request(app.getHttpServer())
-        .post('/product')
-        .send({
-          name: 'Laptop',
-          description: 'High-performance laptop',
-          price: 999.99,
-        });
-
       const createDto = {
         customerId: customerResponse.body.id,
-        productIds: [productResponse.body.id],
-        totalPrice: -100,
+        productIds: [],
       };
 
       await request(app.getHttpServer())
@@ -196,7 +184,6 @@ describe('OrderController (Integration)', () => {
         .send({
           customerId: customerResponse.body.id,
           productIds: [productResponse.body.id],
-          totalPrice: 999.99,
         });
 
       const response = await request(app.getHttpServer())
@@ -233,7 +220,6 @@ describe('OrderController (Integration)', () => {
         .send({
           customerId: customerResponse.body.id,
           productIds: [productResponse.body.id],
-          totalPrice: 999.99,
         });
 
       const response = await request(app.getHttpServer())
@@ -284,7 +270,6 @@ describe('OrderController (Integration)', () => {
         .send({
           customerId: customerResponse.body.id,
           productIds: [product1Response.body.id],
-          totalPrice: 999.99,
         });
 
       const updateDto = {
@@ -322,7 +307,6 @@ describe('OrderController (Integration)', () => {
         .send({
           customerId: customerResponse.body.id,
           productIds: [productResponse.body.id],
-          totalPrice: 999.99,
         });
 
       const response = await request(app.getHttpServer())
@@ -356,7 +340,6 @@ describe('OrderController (Integration)', () => {
         .send({
           customerId: customerResponse.body.id,
           productIds: [productResponse.body.id],
-          totalPrice: 999.99,
         });
 
       await request(app.getHttpServer())
@@ -396,7 +379,6 @@ describe('OrderController (Integration)', () => {
         .send({
           customerId: customerResponse.body.id,
           productIds: [productResponse.body.id],
-          totalPrice: 999.99,
         });
 
       await request(app.getHttpServer())

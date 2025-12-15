@@ -1,4 +1,5 @@
 import {
+  ArrayNotEmpty,
   IsArray,
   IsNotEmpty,
   IsUUID,
@@ -10,6 +11,7 @@ export class CreateOrderDto {
   customerId: string;
 
   @IsArray()
+  @ArrayNotEmpty()
   @IsUUID('4', { each: true })
   productIds: string[];
 }
