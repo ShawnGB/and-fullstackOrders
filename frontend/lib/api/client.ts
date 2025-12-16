@@ -23,7 +23,21 @@ async function apiFetch<T>(
   });
 
   if (!response.ok) {
-    throw new Error(`API Error: ${response.statusText}`);
+    // Try to get error message from response body
+    let errorMessage = response.statusText;
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.message || errorMessage;
+    } catch {
+      // If parsing fails, use statusText
+    }
+    throw new Error(errorMessage);
+  }
+
+  // Check if response has content before parsing
+  const contentLength = response.headers.get("content-length");
+  if (contentLength === "0" || response.status === 204) {
+    return undefined as T;
   }
 
   return response.json();
@@ -47,32 +61,11 @@ export const apiClient = {
       body: JSON.stringify(data),
     }),
 
+  patch: <T>(endpoint: string, data: unknown) =>
+    apiFetch<T>(endpoint, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
   delete: <T>(endpoint: string) => apiFetch<T>(endpoint, { method: "DELETE" }),
-};
-
-/**
- * Client-side API client (for Client Components)
- */
-export const clientApiClient = {
-  get: <T>(endpoint: string) => apiFetch<T>(endpoint, { isClient: true }),
-
-  post: <T>(endpoint: string, data: unknown) =>
-    apiFetch<T>(endpoint, {
-      method: "POST",
-      body: JSON.stringify(data),
-      isClient: true,
-    }),
-
-  put: <T>(endpoint: string, data: unknown) =>
-    apiFetch<T>(endpoint, {
-      method: "PUT",
-      body: JSON.stringify(data),
-      isClient: true,
-    }),
-
-  delete: <T>(endpoint: string) =>
-    apiFetch<T>(endpoint, {
-      method: "DELETE",
-      isClient: true,
-    }),
 };

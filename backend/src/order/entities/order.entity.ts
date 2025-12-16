@@ -20,7 +20,7 @@ export class Order {
   @Column({ generated: 'increment' })
   orderNumber: number;
 
-  @ManyToOne(() => Customer, (customer) => customer.orders)
+  @ManyToOne(() => Customer, (customer) => customer.orders, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'customerId' })
   customer: Customer;
 

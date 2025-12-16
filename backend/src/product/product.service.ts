@@ -1,15 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
+import { Order } from '../order/entities/order.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(Order)
+    private orderRepository: Repository<Order>,
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
@@ -40,6 +43,20 @@ export class ProductService {
 
   async remove(id: string): Promise<void> {
     const product = await this.findOne(id);
+
+    // Check if product is in any orders
+    const ordersWithProduct = await this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoin('order.products', 'product')
+      .where('product.id = :productId', { productId: id })
+      .getCount();
+
+    if (ordersWithProduct > 0) {
+      throw new BadRequestException(
+        `Cannot delete product. It is referenced in ${ordersWithProduct} order(s).`
+      );
+    }
+
     await this.productRepository.remove(product);
   }
 }

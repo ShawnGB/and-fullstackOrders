@@ -3,6 +3,7 @@ import Link from "next/link";
 import { apiClient } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import { formatDate, formatPrice } from "@/lib/utils/formatters";
+import EntityActions from "@/components/features/EntityActions";
 
 async function getOrder(id: string): Promise<Order | null> {
   try {
@@ -59,6 +60,8 @@ export default async function OrderDetailPage({
           <span>{formatDate(order.createdAt)}</span>
         </div>
       </div>
+
+      <EntityActions type="order" entity={order} entityId={order.id} />
 
       <h3>Products ({order.products?.length || 0})</h3>
 

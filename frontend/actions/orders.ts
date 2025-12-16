@@ -17,7 +17,7 @@ export async function createOrder(data: CreateOrder) {
 
 export async function updateOrder(id: string, data: UpdateOrder) {
   try {
-    await apiClient.put(API_ENDPOINTS.orders.update(id), data);
+    await apiClient.patch(API_ENDPOINTS.orders.update(id), data);
     revalidatePath("/orders");
     revalidatePath(`/orders/${id}`);
     return { success: true };

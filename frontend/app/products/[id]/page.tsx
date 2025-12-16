@@ -3,6 +3,7 @@ import Link from "next/link";
 import { apiClient } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import { formatDate, formatPrice } from "@/lib/utils/formatters";
+import EntityActions from "@/components/features/EntityActions";
 
 async function getProduct(id: string): Promise<Product | null> {
   try {
@@ -57,6 +58,8 @@ export default async function ProductDetailPage({
           <span>{formatDate(product.updatedAt)}</span>
         </div>
       </div>
+
+      <EntityActions type="product" entity={product} entityId={product.id} />
     </section>
   );
 }

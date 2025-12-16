@@ -17,7 +17,7 @@ export async function createCustomer(data: CreateCustomer) {
 
 export async function updateCustomer(id: string, data: UpdateCustomer) {
   try {
-    await apiClient.put(API_ENDPOINTS.customers.update(id), data);
+    await apiClient.patch(API_ENDPOINTS.customers.update(id), data);
     revalidatePath("/customers");
     revalidatePath(`/customers/${id}`);
     return { success: true };

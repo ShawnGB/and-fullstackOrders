@@ -3,9 +3,9 @@
 import { useState, ReactNode } from "react";
 import Modal from "./Modal";
 
-interface AddEntityButtonProps {
+interface EditEntityButtonProps {
   title: string;
-  buttonTitle?: string;
+  buttonText?: string;
   onOpen?: () => void | Promise<void>;
   children: (props: {
     onClose: () => void;
@@ -13,12 +13,12 @@ interface AddEntityButtonProps {
   }) => ReactNode;
 }
 
-export default function AddEntityButton({
+export default function EditEntityButton({
   title,
-  buttonTitle = "Create new entity",
+  buttonText = "Edit",
   onOpen,
   children,
-}: AddEntityButtonProps) {
+}: EditEntityButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpen = async () => {
@@ -35,12 +35,8 @@ export default function AddEntityButton({
 
   return (
     <>
-      <button
-        className="btn-add"
-        onClick={handleOpen}
-        title={buttonTitle}
-      >
-        +
+      <button className="btn-primary" onClick={handleOpen}>
+        {buttonText}
       </button>
 
       <Modal isOpen={isModalOpen} onClose={handleClose} title={title}>
