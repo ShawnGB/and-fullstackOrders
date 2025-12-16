@@ -1,19 +1,12 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-
-const API_URL = process.env.API_URL || "http://localhost:3000";
+import { apiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
+import { formatDate, formatPrice } from "@/lib/utils/formatters";
 
 async function getCustomer(id: string): Promise<Customer | null> {
   try {
-    const response = await fetch(`${API_URL}/customer/${id}`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    return response.json();
+    return await apiClient.get<Customer>(API_ENDPOINTS.customers.detail(id));
   } catch (error) {
     console.error("Error fetching customer:", error);
     return null;
@@ -53,7 +46,7 @@ export default async function CustomerDetailPage({
         </div>
         <div className="detail-row">
           <strong>Created:</strong>
-          <span>{new Date(customer.createdAt).toLocaleDateString()}</span>
+          <span>{formatDate(customer.createdAt)}</span>
         </div>
       </div>
 
@@ -79,7 +72,7 @@ export default async function CustomerDetailPage({
                     ? order.products.map((p) => p.name).join(", ")
                     : "No products"}
                 </td>
-                <td>{Number(order.totalPrice).toFixed(2)} €</td>
+                <td>{formatPrice(order.totalPrice)}</td>
               </tr>
             ))}
           </tbody>

@@ -1,19 +1,12 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-
-const API_URL = process.env.API_URL || "http://localhost:3000";
+import { apiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
+import { formatDate, formatPrice } from "@/lib/utils/formatters";
 
 async function getProduct(id: string): Promise<Product | null> {
   try {
-    const response = await fetch(`${API_URL}/product/${id}`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    return response.json();
+    return await apiClient.get<Product>(API_ENDPOINTS.products.detail(id));
   } catch (error) {
     console.error("Error fetching product:", error);
     return null;
@@ -53,15 +46,15 @@ export default async function ProductDetailPage({
         </div>
         <div className="detail-row">
           <strong>Price:</strong>
-          <span>{Number(product.price).toFixed(2)} €</span>
+          <span>{formatPrice(product.price)}</span>
         </div>
         <div className="detail-row">
           <strong>Created:</strong>
-          <span>{new Date(product.createdAt).toLocaleDateString()}</span>
+          <span>{formatDate(product.createdAt)}</span>
         </div>
         <div className="detail-row">
           <strong>Last Updated:</strong>
-          <span>{new Date(product.updatedAt).toLocaleDateString()}</span>
+          <span>{formatDate(product.updatedAt)}</span>
         </div>
       </div>
     </section>

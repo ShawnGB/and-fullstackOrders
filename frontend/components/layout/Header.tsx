@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,17 +12,26 @@ export default function Header() {
       <nav>
         <ul>
           <li>
-            <Link href="/customers" className={pathname === '/customers' ? 'active' : ''}>
+            <Link
+              href="/customers"
+              className={pathname === "/customers" ? "active" : ""}
+            >
               Customers
             </Link>
           </li>
           <li>
-            <Link href="/products" className={pathname === '/products' ? 'active' : ''}>
+            <Link
+              href="/products"
+              className={pathname === "/products" ? "active" : ""}
+            >
               Products
             </Link>
           </li>
           <li>
-            <Link href="/orders" className={pathname === '/orders' ? 'active' : ''}>
+            <Link
+              href="/orders"
+              className={pathname === "/orders" ? "active" : ""}
+            >
               Orders
             </Link>
           </li>

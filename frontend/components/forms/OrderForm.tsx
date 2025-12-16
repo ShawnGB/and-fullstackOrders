@@ -1,17 +1,22 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { clientApiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
+import { formatPrice } from "@/lib/utils/formatters";
 
 interface OrderFormProps {
-  onSubmit: (data: any) => void;
+  onSubmit: (data: CreateOrder) => Promise<boolean>;
   onCancel: () => void;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-
 export default function OrderForm({ onSubmit, onCancel }: OrderFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,18 +24,15 @@ export default function OrderForm({ onSubmit, onCancel }: OrderFormProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [customersRes, productsRes] = await Promise.all([
-          fetch(`${API_URL}/customer`),
-          fetch(`${API_URL}/product`),
+        const [customersData, productsData] = await Promise.all([
+          clientApiClient.get<Customer[]>(API_ENDPOINTS.customers.list),
+          clientApiClient.get<Product[]>(API_ENDPOINTS.products.list),
         ]);
-
-        const customersData = await customersRes.json();
-        const productsData = await productsRes.json();
 
         setCustomers(customersData);
         setProducts(productsData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -39,12 +41,14 @@ export default function OrderForm({ onSubmit, onCancel }: OrderFormProps) {
     fetchData();
   }, []);
 
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = async (data: any) => {
     const productIds = Array.from(
-      document.querySelectorAll<HTMLInputElement>('input[name="productIds"]:checked')
+      document.querySelectorAll<HTMLInputElement>(
+        'input[name="productIds"]:checked',
+      ),
     ).map((checkbox) => checkbox.value);
 
-    onSubmit({
+    await onSubmit({
       customerId: data.customerId,
       productIds,
     });
@@ -60,7 +64,7 @@ export default function OrderForm({ onSubmit, onCancel }: OrderFormProps) {
         <label htmlFor="customerId">Customer</label>
         <select
           id="customerId"
-          {...register('customerId', { required: 'Customer is required' })}
+          {...register("customerId", { required: "Customer is required" })}
         >
           <option value="">Select a customer</option>
           {customers.map((customer) => (
@@ -69,7 +73,9 @@ export default function OrderForm({ onSubmit, onCancel }: OrderFormProps) {
             </option>
           ))}
         </select>
-        {errors.customerId && <span className="error">{errors.customerId.message as string}</span>}
+        {errors.customerId && (
+          <span className="error">{errors.customerId.message as string}</span>
+        )}
       </div>
 
       <div className="form-group">
@@ -77,17 +83,17 @@ export default function OrderForm({ onSubmit, onCancel }: OrderFormProps) {
         <div className="checkbox-group">
           {products.map((product) => (
             <label key={product.id} className="checkbox-label">
-              <input
-                type="checkbox"
-                name="productIds"
-                value={product.id}
-              />
-              <span>{product.name} - {Number(product.price).toFixed(2)} €</span>
+              <input type="checkbox" name="productIds" value={product.id} />
+              <span>
+                {product.name} - {formatPrice(product.price)}
+              </span>
             </label>
           ))}
         </div>
         {products.length === 0 && (
-          <span className="error">No products available. Create products first.</span>
+          <span className="error">
+            No products available. Create products first.
+          </span>
         )}
       </div>
 

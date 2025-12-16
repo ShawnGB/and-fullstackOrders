@@ -1,18 +1,10 @@
-import ProductsTable from "@/components/ProductsTable";
-
-const API_URL = process.env.API_URL || "http://localhost:3000";
+import ProductsTable from "@/components/features/products/ProductsTable";
+import { apiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
 
 async function getProducts(): Promise<Product[]> {
   try {
-    const response = await fetch(`${API_URL}/product`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch products: ${response.statusText}`);
-    }
-
-    return response.json();
+    return await apiClient.get<Product[]>(API_ENDPOINTS.products.list);
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
