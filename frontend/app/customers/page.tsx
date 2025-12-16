@@ -1,18 +1,10 @@
-import CustomersTable from "@/components/CustomersTable";
-
-const API_URL = process.env.API_URL || "http://localhost:3000";
+import CustomersTable from "@/components/features/customers/CustomersTable";
+import { apiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
 
 async function getCustomers(): Promise<Customer[]> {
   try {
-    const response = await fetch(`${API_URL}/customer`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch customers: ${response.statusText}`);
-    }
-
-    return response.json();
+    return await apiClient.get<Customer[]>(API_ENDPOINTS.customers.list);
   } catch (error) {
     console.error("Error fetching customers:", error);
     return [];

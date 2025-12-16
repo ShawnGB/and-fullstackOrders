@@ -1,18 +1,10 @@
-import OrdersTable from "@/components/OrdersTable";
-
-const API_URL = process.env.API_URL || "http://localhost:3000";
+import OrdersTable from "@/components/features/orders/OrdersTable";
+import { apiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
 
 async function getOrders(): Promise<Order[]> {
   try {
-    const response = await fetch(`${API_URL}/order`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch orders: ${response.statusText}`);
-    }
-
-    return response.json();
+    return await apiClient.get<Order[]>(API_ENDPOINTS.orders.list);
   } catch (error) {
     console.error("Error fetching orders:", error);
     return [];

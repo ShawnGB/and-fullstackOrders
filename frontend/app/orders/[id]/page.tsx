@@ -1,19 +1,12 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-
-const API_URL = process.env.API_URL || "http://localhost:3000";
+import { apiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
+import { formatDate, formatPrice } from "@/lib/utils/formatters";
 
 async function getOrder(id: string): Promise<Order | null> {
   try {
-    const response = await fetch(`${API_URL}/order/${id}`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    return response.json();
+    return await apiClient.get<Order>(API_ENDPOINTS.orders.detail(id));
   } catch (error) {
     console.error("Error fetching order:", error);
     return null;
@@ -59,11 +52,11 @@ export default async function OrderDetailPage({
         </div>
         <div className="detail-row">
           <strong>Total Price:</strong>
-          <span>{Number(order.totalPrice).toFixed(2)} €</span>
+          <span>{formatPrice(order.totalPrice)}</span>
         </div>
         <div className="detail-row">
           <strong>Created:</strong>
-          <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+          <span>{formatDate(order.createdAt)}</span>
         </div>
       </div>
 
@@ -85,7 +78,7 @@ export default async function OrderDetailPage({
                   <Link href={`/products/${product.id}`}>{product.name}</Link>
                 </td>
                 <td>{product.description}</td>
-                <td>{Number(product.price).toFixed(2)} €</td>
+                <td>{formatPrice(product.price)}</td>
               </tr>
             ))}
           </tbody>
