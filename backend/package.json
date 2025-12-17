@@ -94,6 +94,9 @@
     "setupFilesAfterEnv": [
       "<rootDir>/../jest.setup.ts"
     ],
-    "testTimeout": 60000
+    "globalSetup": "<rootDir>/../jest.global-setup.ts",
+    "globalTeardown": "<rootDir>/../jest.global-teardown.ts",
+    "testTimeout": 60000,
+    "maxWorkers": 1
   }
 }

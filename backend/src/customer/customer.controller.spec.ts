@@ -5,20 +5,12 @@ import request from 'supertest';
 import { CustomerController } from './customer.controller';
 import { CustomerService } from './customer.service';
 import { Customer } from './entities/customer.entity';
-import { getTestDatabaseConfig, startTestDatabase, stopTestDatabase } from '../test-utils/test-db.config';
+import { getTestDatabaseConfig, cleanupDatabase } from '../test-utils/test-db.config';
 
 describe('CustomerController (Integration)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    await startTestDatabase();
-  }, 60000);
-
-  afterAll(async () => {
-    await stopTestDatabase();
-  });
-
-  beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot(getTestDatabaseConfig()),
@@ -39,8 +31,14 @@ describe('CustomerController (Integration)', () => {
     await app.init();
   });
 
+  afterAll(async () => {
+    if (app) {
+      await app.close();
+    }
+  });
+
   afterEach(async () => {
-    await app.close();
+    await cleanupDatabase();
   });
 
   describe('POST /customer', () => {

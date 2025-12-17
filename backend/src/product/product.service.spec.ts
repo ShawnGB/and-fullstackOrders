@@ -3,7 +3,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from './entities/product.entity';
-import { getTestDatabaseConfig, startTestDatabase, stopTestDatabase } from '../test-utils/test-db.config';
+import { Order } from '../order/entities/order.entity';
+import { Customer } from '../customer/entities/customer.entity';
+import { getTestDatabaseConfig, cleanupDatabase } from '../test-utils/test-db.config';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -12,18 +14,10 @@ describe('ProductService', () => {
   let module: TestingModule;
 
   beforeAll(async () => {
-    await startTestDatabase();
-  }, 60000);
-
-  afterAll(async () => {
-    await stopTestDatabase();
-  });
-
-  beforeEach(async () => {
     module = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot(getTestDatabaseConfig()),
-        TypeOrmModule.forFeature([Product]),
+        TypeOrmModule.forFeature([Product, Order, Customer]),
       ],
       providers: [ProductService],
     }).compile();
@@ -31,8 +25,14 @@ describe('ProductService', () => {
     service = module.get<ProductService>(ProductService);
   });
 
+  afterAll(async () => {
+    if (module) {
+      await module.close();
+    }
+  });
+
   afterEach(async () => {
-    await module.close();
+    await cleanupDatabase();
   });
 
   it('should be defined', () => {

@@ -11,20 +11,12 @@ import { CustomerController } from '../customer/customer.controller';
 import { CustomerService } from '../customer/customer.service';
 import { ProductController } from '../product/product.controller';
 import { ProductService } from '../product/product.service';
-import { getTestDatabaseConfig, startTestDatabase, stopTestDatabase } from '../test-utils/test-db.config';
+import { getTestDatabaseConfig, cleanupDatabase } from '../test-utils/test-db.config';
 
 describe('OrderController (Integration)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    await startTestDatabase();
-  }, 60000);
-
-  afterAll(async () => {
-    await stopTestDatabase();
-  });
-
-  beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot(getTestDatabaseConfig()),
@@ -45,8 +37,14 @@ describe('OrderController (Integration)', () => {
     await app.init();
   });
 
+  afterAll(async () => {
+    if (app) {
+      await app.close();
+    }
+  });
+
   afterEach(async () => {
-    await app.close();
+    await cleanupDatabase();
   });
 
   describe('POST /order', () => {

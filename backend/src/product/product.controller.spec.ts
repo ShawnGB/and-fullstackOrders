@@ -5,24 +5,18 @@ import request from 'supertest';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { Product } from './entities/product.entity';
-import { getTestDatabaseConfig, startTestDatabase, stopTestDatabase } from '../test-utils/test-db.config';
+import { Order } from '../order/entities/order.entity';
+import { Customer } from '../customer/entities/customer.entity';
+import { getTestDatabaseConfig, cleanupDatabase } from '../test-utils/test-db.config';
 
 describe('ProductController (Integration)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    await startTestDatabase();
-  }, 60000);
-
-  afterAll(async () => {
-    await stopTestDatabase();
-  });
-
-  beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot(getTestDatabaseConfig()),
-        TypeOrmModule.forFeature([Product]),
+        TypeOrmModule.forFeature([Product, Order, Customer]),
       ],
       controllers: [ProductController],
       providers: [ProductService],
@@ -39,8 +33,14 @@ describe('ProductController (Integration)', () => {
     await app.init();
   });
 
+  afterAll(async () => {
+    if (app) {
+      await app.close();
+    }
+  });
+
   afterEach(async () => {
-    await app.close();
+    await cleanupDatabase();
   });
 
   describe('POST /product', () => {

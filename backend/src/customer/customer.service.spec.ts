@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { Customer } from './entities/customer.entity';
-import { getTestDatabaseConfig, startTestDatabase, stopTestDatabase } from '../test-utils/test-db.config';
+import { getTestDatabaseConfig, cleanupDatabase } from '../test-utils/test-db.config';
 import * as bcrypt from 'bcrypt';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -13,14 +13,6 @@ describe('CustomerService', () => {
   let module: TestingModule;
 
   beforeAll(async () => {
-    await startTestDatabase();
-  }, 60000);
-
-  afterAll(async () => {
-    await stopTestDatabase();
-  });
-
-  beforeEach(async () => {
     module = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot(getTestDatabaseConfig()),
@@ -32,8 +24,14 @@ describe('CustomerService', () => {
     service = module.get<CustomerService>(CustomerService);
   });
 
+  afterAll(async () => {
+    if (module) {
+      await module.close();
+    }
+  });
+
   afterEach(async () => {
-    await module.close();
+    await cleanupDatabase();
   });
 
   it('should be defined', () => {

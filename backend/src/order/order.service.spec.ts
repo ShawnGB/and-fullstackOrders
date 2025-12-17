@@ -5,7 +5,7 @@ import { OrderService } from './order.service';
 import { Order } from './entities/order.entity';
 import { Product } from '../product/entities/product.entity';
 import { Customer } from '../customer/entities/customer.entity';
-import { getTestDatabaseConfig, startTestDatabase, stopTestDatabase } from '../test-utils/test-db.config';
+import { getTestDatabaseConfig, cleanupDatabase } from '../test-utils/test-db.config';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Repository } from 'typeorm';
@@ -18,14 +18,6 @@ describe('OrderService', () => {
   let productRepository: Repository<Product>;
 
   beforeAll(async () => {
-    await startTestDatabase();
-  }, 60000);
-
-  afterAll(async () => {
-    await stopTestDatabase();
-  });
-
-  beforeEach(async () => {
     module = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot(getTestDatabaseConfig()),
@@ -43,8 +35,14 @@ describe('OrderService', () => {
     );
   });
 
+  afterAll(async () => {
+    if (module) {
+      await module.close();
+    }
+  });
+
   afterEach(async () => {
-    await module.close();
+    await cleanupDatabase();
   });
 
   it('should be defined', () => {
