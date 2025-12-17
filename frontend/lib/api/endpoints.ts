@@ -2,6 +2,13 @@
  * Centralized API endpoint definitions
  */
 export const API_ENDPOINTS = {
+  auth: {
+    login: "/auth/login",
+    register: "/auth/register",
+    logout: "/auth/logout",
+    refresh: "/auth/refresh",
+    me: "/auth/me",
+  },
   customers: {
     list: "/customer",
     detail: (id: string) => `/customer/${id}`,

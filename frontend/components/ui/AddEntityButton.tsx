@@ -6,6 +6,7 @@ import Modal from "./Modal";
 interface AddEntityButtonProps {
   title: string;
   buttonTitle?: string;
+  onOpen?: () => void | Promise<void>;
   children: (props: {
     onClose: () => void;
     onSuccess: () => void;
@@ -15,9 +16,17 @@ interface AddEntityButtonProps {
 export default function AddEntityButton({
   title,
   buttonTitle = "Create new entity",
+  onOpen,
   children,
 }: AddEntityButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpen = async () => {
+    setIsModalOpen(true);
+    if (onOpen) {
+      await onOpen();
+    }
+  };
 
   const handleClose = () => setIsModalOpen(false);
   const handleSuccess = () => {
@@ -28,7 +37,7 @@ export default function AddEntityButton({
     <>
       <button
         className="btn-add"
-        onClick={() => setIsModalOpen(true)}
+        onClick={handleOpen}
         title={buttonTitle}
       >
         +

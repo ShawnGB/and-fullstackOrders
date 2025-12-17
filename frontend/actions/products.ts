@@ -17,7 +17,7 @@ export async function createProduct(data: CreateProduct) {
 
 export async function updateProduct(id: string, data: UpdateProduct) {
   try {
-    await apiClient.put(API_ENDPOINTS.products.update(id), data);
+    await apiClient.patch(API_ENDPOINTS.products.update(id), data);
     revalidatePath("/products");
     revalidatePath(`/products/${id}`);
     return { success: true };

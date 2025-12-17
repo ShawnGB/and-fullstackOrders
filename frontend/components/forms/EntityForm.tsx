@@ -1,25 +1,41 @@
 "use client";
 
 import { useForm } from "react-hook-form";
+import { formatPrice } from "@/lib/utils/formatters";
 
-type EntityType = "customer" | "product";
+type EntityType = "customer" | "product" | "order";
 
 interface EntityFormProps {
   type: EntityType;
   onSubmit: (data: any) => void;
   onCancel: () => void;
+  customers?: Customer[];
+  products?: Product[];
+  initialValues?: any;
 }
 
 export default function EntityForm({
   type,
   onSubmit,
   onCancel,
+  customers,
+  products,
+  initialValues,
 }: EntityFormProps) {
+  const isEditing = !!initialValues;
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: initialValues || (type === "order"
+      ? {
+          customerId: "",
+          productIds: [] as string[],
+        }
+      : {}),
+  });
 
   const renderFields = () => {
     switch (type) {
@@ -54,25 +70,27 @@ export default function EntityForm({
                 <span className="error">{errors.email.message as string}</span>
               )}
             </div>
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
-                  },
-                })}
-              />
-              {errors.password && (
-                <span className="error">
-                  {errors.password.message as string}
-                </span>
-              )}
-            </div>
+            {!isEditing && (
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters",
+                    },
+                  })}
+                />
+                {errors.password && (
+                  <span className="error">
+                    {errors.password.message as string}
+                  </span>
+                )}
+              </div>
+            )}
           </>
         );
 
@@ -122,6 +140,60 @@ export default function EntityForm({
             </div>
           </>
         );
+
+      case "order":
+        return (
+          <>
+            <div className="form-group">
+              <label htmlFor="customerId">Customer</label>
+              <select
+                id="customerId"
+                {...register("customerId", {
+                  required: "Customer is required",
+                })}
+              >
+                <option value="">Select a customer</option>
+                {customers?.map((customer) => (
+                  <option key={customer.id} value={customer.id}>
+                    {customer.name} ({customer.email})
+                  </option>
+                ))}
+              </select>
+              {errors.customerId && (
+                <span className="error">
+                  {errors.customerId.message as string}
+                </span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label>Products (select at least one)</label>
+              <div className="checkbox-group">
+                {products?.map((product) => (
+                  <label key={product.id} className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      value={product.id}
+                      {...register("productIds", {
+                        validate: (value) =>
+                          (value && value.length > 0) ||
+                          "Select at least one product",
+                      })}
+                    />
+                    <span>
+                      {product.name} - {formatPrice(product.price)}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              {errors.productIds && (
+                <span className="error">
+                  {errors.productIds.message as string}
+                </span>
+              )}
+            </div>
+          </>
+        );
     }
   };
 
@@ -133,7 +205,7 @@ export default function EntityForm({
           Cancel
         </button>
         <button type="submit" className="btn-primary">
-          Create
+          {isEditing ? "Update" : "Create"}
         </button>
       </div>
     </form>

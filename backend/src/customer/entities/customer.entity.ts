@@ -24,7 +24,7 @@ export class Customer {
   @Exclude()
   password: string;
 
-  @OneToMany(() => Order, (order) => order.customer)
+  @OneToMany(() => Order, (order) => order.customer, { cascade: true })
   orders: Order[];
 
   @CreateDateColumn()
