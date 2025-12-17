@@ -2,9 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuthStore } from "@/lib/stores/auth-store";
+import { logoutAndRedirect } from "@/actions/auth";
 
 export default function Header() {
   const pathname = usePathname();
+  const { user, isAuthenticated } = useAuthStore();
+
+  const handleLogout = async () => {
+    await logoutAndRedirect();
+  };
 
   return (
     <header>
@@ -37,6 +44,20 @@ export default function Header() {
           </li>
         </ul>
       </nav>
+
+      <div className="auth-section">
+        {isAuthenticated && user ? (
+          <>
+            <span>Welcome, {user.name}</span>
+            <button onClick={handleLogout}>Logout</button>
+          </>
+        ) : (
+          <>
+            <Link href="/auth/login">Login</Link>
+            <Link href="/auth/register">Register</Link>
+          </>
+        )}
+      </div>
     </header>
   );
 }

@@ -1,9 +1,4 @@
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsNotEmpty,
-  IsUUID,
-} from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class CreateOrderDto {
   @IsUUID()
